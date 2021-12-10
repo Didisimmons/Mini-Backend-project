@@ -1,12 +1,11 @@
 import os
 from flask import (
     Flask, flash, render_template,
-    redirect, request, url_for, session)  
-from flask_pymongo import PyMongo 
-from bson.objectid import ObjectId #In order to find documents from MongoDB
+    redirect, request, session, url_for)
+from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 if os.path.exists("env.py"):
     import env
-
 
 app = Flask(__name__)
 
@@ -19,10 +18,9 @@ mongo = PyMongo(app)
 
 @app.route("/")
 @app.route("/get_tasks")
-#generate data from our tasks collection
 def get_tasks():
     tasks = mongo.db.tasks.find()
-    return render_template("tasks.html" , tasks=tasks)
+    return render_template("tasks.html", tasks=tasks)
 
 
 if __name__ == "__main__":
