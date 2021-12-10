@@ -90,9 +90,22 @@ def profile(username):
     record """
     username = mongo.db.users.find_one(
         {"username": session["user"]})["username"]
-    return render_template("profile.html", username=username)
-    
 
+    """If our session['user'] cookie is truthy, then we want to return the appropriate profile
+    template so that users can't just force the URL to someone else's profile"""
+    if session["user"]:
+        return render_template("profile.html", username=username)
+    
+    """ However, if it's not true or doesn't exist, we'll return the user back to the login template
+    instead """
+    return redirect(url_for("login"))
+
+@app.route("/logout")
+def logout():
+    #remove user from session cookies
+    flash("You have been logged out")
+    session.pop("user")
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
