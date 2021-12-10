@@ -44,13 +44,17 @@ def register():
 
         #put the new user into 'session' temporary cookie and store data in mongoDB
         session["user"] = request.form.get("username").lower()#The session key in square-brackets can be whatever we'd like to call it
-        flash("Registration Successful!")  
+        flash("Registration Successful!")
+        """let's redirect them to our new profile template.
+        Our profile template is looking for the variable of 'username' if you recall, so we need to
+        set that equal to the same session cookie of 'user' """
+        return redirect(url_for("profile",username=session["user"]))
     return render_template("register.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-     if request.method == "POST":
+    if request.method == "POST":
         #check if username already exists in db if the Mongo username field matches that of the input-field in the form
         existing_user = mongo.db.users.find_one(
             {"username": request.form.get("username").lower()})
@@ -60,7 +64,10 @@ def login():
             if check_password_hash(
                 existing_user["password"], request.form.get("password")):
                     session["user"] = request.form.get("username").lower()#The session key in square-brackets can be whatever but its consistent for this project
-                    flash("Welcome, {}".format(request.form.get("username")))#and the format will be our requested form elementfor 'username'.
+                    flash("Welcome, {}".format(
+                        request.form.get("username")))#the format will be our requested form elementfor 'username'.
+                    return redirect(url_for(
+                        "profile",username=session["user"]))
             else:
                 #invalid password match
                 flash("Incorrect Username and/or Password")
@@ -71,7 +78,20 @@ def login():
             flash("Incorrect Username and/or Password")
             return redirect (url_for("login"))
 
-     return render_template("login.html")
+    return render_template("login.html")
+
+
+@app.route("/profile/<username>", methods=["GET", "POST"])
+def profile(username):
+    # create a new variable called 'username', and that will be the user that we find from the database, but this time, we'll use our session variable of 'user'.
+    #grab the session user's username from the database     
+    """ we want to retrieve just the username stored, so at the end, let's include more
+    square-brackets to specify that we only want to grab the 'username' key field from this
+    record """
+    username = mongo.db.users.find_one(
+        {"username": session["user"]})["username"]
+    return render_template("profile.html", username=username)
+    
 
 
 if __name__ == "__main__":
