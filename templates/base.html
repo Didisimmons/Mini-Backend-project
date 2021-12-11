@@ -24,7 +24,7 @@
                     {% if session.user %} <!-- if truth since 'user' is the name of our session variable-->
                         <li><a href="{{url_for('profile',username=session['user'])}}">Profile</a></li> <!-- we need to
                             tell it what the 'username' variable is-->
-                        <li><a href="#">New Task</a></li>
+                        <li><a href="{{url_for('add_task')}}">New Task</a></li>
                         <li><a href="#">Manage Categories</a></li>
                         <li><a href="{{url_for('logout')}}">Log Out</a></li>
                     {% else %}
@@ -42,7 +42,7 @@
                 {% if session.user %} <!-- if truth since 'user' is the name of our session variable-->
                     <li><a href="{{url_for('profile',username=session['user'])}}">Profile</a></li> <!-- we need to
                             tell it what the 'username' variable is-->
-                    <li><a href="#">New Task</a></li>
+                    <li><a href="{{url_for('add_task')}}">New Task</a></li>
                     <li><a href="#">Manage Categories</a></li>
                     <li><a href="{{url_for('logout')}}">Log Out</a></li>
                 {% else %}
