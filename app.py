@@ -76,7 +76,7 @@ def login():
         else:
             #username does not exist 
             flash("Incorrect Username and/or Password")
-            return redirect (url_for("login"))
+            return redirect(url_for("login"))
 
     return render_template("login.html")
 
@@ -109,6 +109,7 @@ def logout():
     flash("You have been logged out")
     session.pop("user")
     return redirect(url_for("login"))
+
 
 @app.route("/add_task")
 def add_task():
