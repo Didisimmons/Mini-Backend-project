@@ -111,8 +111,28 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route("/add_task")
+@app.route("/add_task", methods=["GET", "POST"])
 def add_task():
+    if request.method == "POST":
+        """create our own dictionary of items from the form, stored in a variable
+        called 'task'.Inside of this dictionary, we set our key-value pairs 
+        using our name attributes from the form"""
+        """ Create a new variable, which will also be called 'is_urgent'.
+        That will be set to 'on' if our requested form element for 'is_urgent' is truthy.
+        Otherwise, or else, it will be set to 'off' by default"""
+        is_urgent = "on" if request.form.get("is_urgent") else "off"
+        task = {
+            "category_name": request.form.get("category_name"),
+            "task_name":request.form.get("task_name"),
+            "task_description":request.form.get("task_description"),
+            "is_urgent": is_urgent,
+            "due_date":request.form.get("due_date"),
+            "created_by": session["user"] #This will grab the username of the person adding the new task, and insert it here
+        }
+        mongo.db.tasks.insert_one(task)
+        flash("Task Sucessfully Added!")
+        return redirect(url_for("get_tasks"))
+
     """ our Categories collection on MongoDB would dynamically
     generate an <option> instance for each category in our collection
     The categories will display in the same order we added them to the database, so let's sort
