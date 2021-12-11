@@ -27,7 +27,7 @@ def get_tasks():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        #check if username already exists in db if the Mongo username field matches that of the input-field in the form
+    #check if username already exists in db if the Mongo username field matches that of the input-field in the form
         existing_user = mongo.db.users.find_one(
             {"username": request.form.get("username").lower()})
 
@@ -48,7 +48,7 @@ def register():
         """let's redirect them to our new profile template.
         Our profile template is looking for the variable of 'username' if you recall, so we need to
         set that equal to the same session cookie of 'user' """
-        return redirect(url_for("profile",username=session["user"]))
+        return redirect(url_for("profile", username=session["user"]))
     return render_template("register.html")
 
 
@@ -113,8 +113,12 @@ def logout():
 
 @app.route("/add_task")
 def add_task():
-    return render_template("add_task.html")
-
+    """ our Categories collection on MongoDB would dynamically
+    generate an <option> instance for each category in our collection
+    The categories will display in the same order we added them to the database, so let's sort
+    them by the category_name key, using 1 for ascending, or alphabetical."""
+    categories = mongo.db.categories.find().sort("category_name", 1)
+    return render_template("add_task.html", categories=categories)
 
 
 if __name__ == "__main__":
