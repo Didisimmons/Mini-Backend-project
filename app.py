@@ -20,7 +20,7 @@ mongo = PyMongo(app)
 @app.route("/")
 @app.route("/get_tasks")
 def get_tasks():
-    tasks = mongo.db.tasks.find()
+    tasks = list(mongo.db.tasks.find())
     return render_template("tasks.html", tasks=tasks)
 
 
@@ -94,7 +94,9 @@ def profile(username):
     """If our session['user'] cookie is truthy, then we want to return the appropriate profile
     template so that users can't just force the URL to someone else's profile"""
     if session["user"]:
-        return render_template("profile.html", username=username)
+        #The first 'username' is what the template is expecting to retrieve on the HTML file.
+        # The second 'username' is what we've defined on the line above.
+        return render_template("profile.html", username=username) 
     
     """ However, if it's not true or doesn't exist, we'll return the user back to the login template
     instead """
