@@ -162,8 +162,16 @@ def edit_task(task_id):
     return render_template("edit_task.html", task=task, categories=categories)
 
 
+@app.route("/delete_task/<task_id>")
+def delete_task(task_id):
+    """Similar to how we retrieve or edit a task, we need to get the specific task by the ObjectId
+    that matches the 'task_id' variable """
+    mongo.db.tasks.delete_one({"_id": ObjectId(task_id)})
+    flash("Task successfully deleted")
+    return redirect(url_for("get_tasks"))
 
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
-            port=(os.environ.get("PORT")),
-            debug=True)
+        port=int(os.environ.get("PORT")),
+        debug=True)
+
