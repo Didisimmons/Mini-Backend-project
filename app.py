@@ -144,6 +144,7 @@ def add_task():
 
 @app.route("/edit_task/<task_id>", methods=["GET", "POST"])
 def edit_task(task_id):
+    """The POST functionality for editing a task is quite similar to adding a task"""
     if request.method == "POST":
         is_urgent = "on" if request.form.get("is_urgent") else "off"
         submit = {
@@ -154,9 +155,24 @@ def edit_task(task_id):
             "due_date": request.form.get("due_date"),
             "created_by": session["user"]
         }
+        """ We need to rename the above dictionary variable one so we don't have duplicate 
+        variable names, that is updated in to MongoDB as well.This time, we're not inserting_one,
+        but instead, we're going to use the .update() method.This method takes two parameters, 
+        both of which are dictionaries.the second one already is the dictionary of our submitted
+        items from the form. The first one needs to specify which task we're going to update, 
+        and we'll target that by using the ObjectID.The task_id is being passed through our route,
+        so we can have it search based on that ID.
+        To recap, we're going to search for a task in the database by the task ID coming from
+        the route """
         mongo.db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": submit})
         flash("Task Successfully Updated")
 
+    """First, we need to retrieve the task from the database that we are wanting to edit.
+    A guaranteed way of targeting the correct task, is to use its ID, similar to a primary
+    key in a relational database"""
+    """The ID needs to be converted into a BSON data-type, which is a readable format that's acceptable
+    by MongoDB.This is the 'task_id' that we want to search within the database, which is going to be
+    passed through into our URL """
     task = mongo.db.tasks.find_one({"_id": ObjectId(task_id)})
     categories = mongo.db.categories.find().sort("category_name", 1)
     return render_template("edit_task.html", task=task, categories=categories)
@@ -169,6 +185,18 @@ def delete_task(task_id):
     mongo.db.tasks.delete_one({"_id": ObjectId(task_id)})
     flash("Task successfully deleted")
     return redirect(url_for("get_tasks"))
+    
+
+
+@app.route("/get_categories")
+def get_categories():
+    """We're also going to convert it to a proper list, and then sort them alphabetically by
+    the category_name """
+    categories = list(mongo.db.categories.find().sort("category_name", 1))
+    """the first 'categories' is what gets passed into our template(name of html file)
+    The second 'categories' is the variable defined above, what's actually being returned from
+    the database"""
+    return render_template("categories.html", categories=categories)
 
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
