@@ -9,7 +9,7 @@
         <!--we need to send through that variable, or parameter, that we've called 'task_id'.
         The 'task_id' will be equal to our current 'task' being modified, and using dot-notation,
         we want to target its specific '_id' key from the document -->
-        <form class="col s12" method="POST" action="{{url_for('edit_task', task_id=task._id)}}">
+        <form class="col s12" method="POST" action="{{ url_for('edit_task', task_id=task._id) }}">
             <!-- The only difference, is that since it's not an expression being displayed on screen, we
             don't wrap it in double curly-brackets.-->
             <!-- category selection-->

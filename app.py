@@ -142,18 +142,24 @@ def add_task():
     #This function will pretty much do the same thing as our GET method on the 'add_task'function above
 
 
-@app.route("/edit_task/<task_id>" , methods=["GET", "POST"])
+@app.route("/edit_task/<task_id>", methods=["GET", "POST"])
 def edit_task(task_id):
-    """First, we need to retrieve the task from the database that we are wanting to edit.
-    A guaranteed way of targeting the correct task, is to use its ID, similar to a primary
-    key in a relational database"""
-    """The ID needs to be converted into a BSON data-type, which is a readable format that's acceptable
-    by MongoDB.This is the 'task_id' that we want to search within the database, which is going to be
-    passed through into our URL """
+    if request.method == "POST":
+        is_urgent = "on" if request.form.get("is_urgent") else "off"
+        submit = {
+            "category_name": request.form.get("category_name"),
+            "task_name": request.form.get("task_name"),
+            "task_description": request.form.get("task_description"),
+            "is_urgent": is_urgent,
+            "due_date": request.form.get("due_date"),
+            "created_by": session["user"]
+        }
+        mongo.db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": submit})
+        flash("Task Successfully Updated")
+
     task = mongo.db.tasks.find_one({"_id": ObjectId(task_id)})
     categories = mongo.db.categories.find().sort("category_name", 1)
     return render_template("edit_task.html", task=task, categories=categories)
-    #This time our edit page needs to know which specific task is being modified,so we'll send through the 'task' variable found above.
 
 
 
