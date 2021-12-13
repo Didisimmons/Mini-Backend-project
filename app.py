@@ -232,6 +232,16 @@ def edit_category(category_id):
     is being updated on the form.set that equal to the new category variable found above"""
     return render_template("edit_category.html", category=category)
 
+
+"""We don't need any POST method, since we aren't sending any new information to the database"""
+@app.route("/delete_category/<category_id>")
+def delete_category(category_id):
+    mongo.db.categories.delete_one({"_id": ObjectId(category_id)})
+    flash("Category successfully deleted")
+    return redirect(url_for("get_categories"))
+
+
+
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
         port=int(os.environ.get("PORT")),
