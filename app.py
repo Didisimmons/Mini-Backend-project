@@ -65,7 +65,7 @@ def login():
                 existing_user["password"], request.form.get("password")):
                     session["user"] = request.form.get("username").lower()#The session key in square-brackets can be whatever but its consistent for this project
                     flash("Welcome, {}".format(
-                        request.form.get("username")))#the format will be our requested form elementfor 'username'.
+                    request.form.get("username")))#the format will be our requested form elementfor 'username'.
                     return redirect(url_for(
                         "profile",username=session["user"]))
             else:
@@ -211,6 +211,26 @@ def add_category():
 
     return render_template("add_category.html")
 
+
+@app.route("/edit_category/<category_id>", methods=["GET", "POST"])
+def edit_category(category_id):
+    """Our form only has the one item, 'category_name', which we'll get from the requested form itself"""
+    if request.method == "POST":
+        submit = {
+            "category_name": request.form.get("category_name"),
+        }
+        """The second one is our 'submit' dictionary, so it knows what new information will be updated
+        in the database.The first dictionary will define which specific category we want to update"""
+        mongo.db.categories.update_one({"_id": ObjectId(category_id)}, {"$set": submit})
+        flash("Category Sucessfully Updated")
+        return redirect(url_for("get_categories"))
+
+    """using the ObjectID, this will render as BSON in order to properly display
+    between MongoDB and Flask"""
+    category = mongo.db.categories.find_one({"_id": ObjectId(category_id)})
+    """Our template is expecting a variable called 'category', so that we can specify which category
+    is being updated on the form.set that equal to the new category variable found above"""
+    return render_template("edit_category.html", category=category)
 
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
