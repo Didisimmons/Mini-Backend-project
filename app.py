@@ -24,6 +24,18 @@ def get_tasks():
     return render_template("tasks.html", tasks=tasks)
 
 
+@app.route("/search",methods=["GET", "POST"])
+def search():
+    """which will be the query name attribute from our form"""
+    query = request.form.get('query')
+    """ instead of finding all documents from the tasks collection, we need to 
+    perform our Text Index search. This dictionary uses '$text', which itself 
+    is expecting another dictionary of '$search'.Essentially, this means that 
+    we want to perform a '$search' on any '$text Index' for this collection
+    using the query variable """
+    tasks = list(mongo.db.tasks.find({"$text": {"$search": query}}))
+    return render_template("tasks.html", tasks=tasks)
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
